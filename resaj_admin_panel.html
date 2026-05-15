@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RE:SAJ Bangladesh — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g900: #0A2E12; --g800: #133D1B; --g700: #1A5225; --g600: #216630;
+    --g500: #2A7D3C; --g400: #3A9E52; --g300: #5DC177; --g200: #9EDAAA;
+    --g100: #CBF0D1; --g50: #EDFAEF;
+    --red: #C0392B; --amber: #D97706; --blue: #1D6FA4; --purple: #6B46C1;
+    --bg: #F0F4F1; --card: #FFFFFF;
+    --text: #0A1F0D; --muted: #5A7060; --border: #D6E8D9;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    background: var(--g900);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo-row { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--g400);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 22px; height: 22px; }
+  .logo-name { color: white; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+  .logo-sub { color: var(--g300); font-size: 9px; font-weight: 500; letter-spacing: 1px; margin-top: 2px; }
+
+  .nav-section { padding: 14px 10px; flex: 1; }
+  .nav-label { color: var(--g400); font-size: 9px; font-weight: 600; letter-spacing: 1px; padding: 0 8px; margin-bottom: 6px; margin-top: 12px; }
+  .nav-label:first-child { margin-top: 0; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    color: var(--g200);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: var(--font);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); }
+  .nav-item.active { background: var(--g700); color: white; }
+  .nav-item svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 14px 10px 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .admin-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+  }
+  .admin-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--g400);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .admin-name { color: white; font-size: 12px; font-weight: 600; }
+  .admin-role { color: var(--g300); font-size: 9px; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .page-heading { font-size: 18px; font-weight: 700; color: var(--text); }
+  .page-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-badge {
+    background: var(--g50);
+    border: 1px solid var(--g100);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--g700);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .topbar-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--g400); }
+
+  .content { flex: 1; overflow-y: auto; padding: 20px 24px 32px; }
+  .content::-webkit-scrollbar { width: 4px; }
+  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 14px 0 0 14px;
+  }
+  .stat-card.green::before { background: var(--g400); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.red::before { background: var(--red); }
+
+  .stat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stat-icon.green { background: var(--g50); }
+  .stat-icon.blue { background: #E6F1FB; }
+  .stat-icon.amber { background: #FEF3C7; }
+  .stat-icon.red { background: #FCEBEB; }
+  .stat-icon svg { width: 18px; height: 18px; fill: none; stroke-width: 1.5; }
+  .stat-icon.green svg { stroke: var(--g600); }
+  .stat-icon.blue svg { stroke: var(--blue); }
+  .stat-icon.amber svg { stroke: var(--amber); }
+  .stat-icon.red svg { stroke: var(--red); }
+
+  .stat-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .stat-badge.up { background: var(--g50); color: var(--g600); }
+  .stat-badge.down { background: #FCEBEB; color: var(--red); }
+
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* TWO COLUMN LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .three-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .panel {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .panel-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .panel-action {
+    background: var(--g900);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .panel-action svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2; }
+  .panel-body { padding: 14px 18px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--g50); }
+
+  .user-cell { display: flex; align-items: center; gap: 8px; }
+  .user-av {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--g100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: var(--g700);
+    flex-shrink: 0;
+  }
+  .user-name { font-size: 12px; font-weight: 600; }
+  .user-area { font-size: 10px; color: var(--muted); }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .status-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+  .status-pill.active { background: var(--g50); color: var(--g700); }
+  .status-pill.active::before { background: var(--g400); }
+  .status-pill.pending { background: #FEF3C7; color: var(--amber); }
+  .status-pill.pending::before { background: var(--amber); }
+  .status-pill.completed { background: #E6F1FB; color: var(--blue); }
+  .status-pill.completed::before { background: var(--blue); }
+  .status-pill.cancelled { background: #FCEBEB; color: var(--red); }
+  .status-pill.cancelled::before { background: var(--red); }
+
+  .pts-badge {
+    display: inline-block;
+    background: var(--g50);
+    color: var(--g700);
+    border: 1px solid var(--g100);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+
+  .action-dots {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-size: 16px; padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .action-dots:hover { background: var(--bg); }
+
+  /* CREDIT MODAL */
+  .credit-btn {
+    background: var(--g600);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+
+  /* INVENTORY */
+  .inv-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .inv-row:last-child { border-bottom: none; }
+  .inv-emoji { font-size: 22px; width: 40px; height: 40px; background: var(--g50); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .inv-name { font-size: 12px; font-weight: 600; }
+  .inv-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .inv-right { margin-left: auto; text-align: right; }
+  .inv-stock { font-size: 13px; font-weight: 700; color: var(--text); }
+  .inv-sold { font-size: 10px; color: var(--muted); }
+  .stock-bar-wrap { flex: 1; max-width: 80px; }
+  .stock-bar-bg { background: var(--border); border-radius: 4px; height: 6px; }
+  .stock-bar-fill { height: 6px; border-radius: 4px; background: var(--g400); transition: width 0.3s; }
+  .stock-bar-fill.low { background: var(--red); }
+  .stock-bar-fill.med { background: var(--amber); }
+
+  /* PICKUP CARD */
+  .pickup-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pickup-item:last-child { border-bottom: none; }
+  .pickup-num {
+    width: 28px; height: 28px;
+    background: var(--g900);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .pickup-name { font-size: 12px; font-weight: 600; }
+  .pickup-area { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .pickup-types { display: flex; gap: 4px; margin-top: 5px; }
+  .type-tag {
+    background: var(--g50);
+    border: 1px solid var(--g100);
+    color: var(--g700);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  /* CHART AREA */
+  .chart-placeholder {
+    background: var(--bg);
+    border-radius: 10px;
+    height: 120px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 12px;
+    gap: 4px;
+  }
+  .bar-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex: 1;
+  }
+  .bar-fill {
+    width: 100%;
+    max-width: 28px;
+    background: var(--g300);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.4s ease;
+  }
+  .bar-label { font-size: 8px; color: var(--muted); font-weight: 500; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 18px;
+    padding: 24px 26px;
+    width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .modal-field input, .modal-field select, .modal-field textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: var(--font);
+    color: var(--text);
+    outline: none;
+    background: var(--bg);
+  }
+  .modal-field input:focus, .modal-field select:focus { border-color: var(--g400); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .modal-btn {
+    flex: 1; padding: 11px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+  }
+  .modal-btn.primary { background: var(--g600); color: white; }
+  .modal-btn.secondary { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+
+  /* HEATMAP */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 12px 0;
+  }
+  .hm-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 600;
+    color: var(--g700);
+  }
+  .hm-0 { background: var(--g50); }
+  .hm-1 { background: var(--g100); }
+  .hm-2 { background: var(--g200); }
+  .hm-3 { background: var(--g300); color: white; }
+  .hm-4 { background: var(--g500); color: white; }
+
+  .metric-row { display: flex; gap: 12px; padding-bottom: 12px; }
+  .metric-mini {
+    flex: 1;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .metric-mini .val { font-size: 18px; font-weight: 700; color: var(--text); }
+  .metric-mini .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon" style="background: none;">
+  <img src="images/resaj_logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+</div>
+      <div>
+        <div class="logo-name">RE:SAJ</div>
+        <div class="logo-sub">ADMIN PANEL</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item active" onclick="showSection('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showSection('users')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+      <span class="nav-badge">2,341</span>
+    </button>
+
+    <div class="nav-label">Operations</div>
+    <button class="nav-item" onclick="showSection('pickups')">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Pickup Requests
+      <span class="nav-badge">12</span>
+    </button>
+    <button class="nav-item" onclick="showSection('inventory')">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Inventory
+    </button>
+    <button class="nav-item" onclick="showSection('transactions')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Transactions
+    </button>
+
+    <div class="nav-label">Analytics</div>
+    <button class="nav-item" onclick="showSection('reports')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports &amp; Heatmap
+    </button>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Waste Heatmap
+    </button>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Incidents
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="admin-card">
+      <div class="admin-avatar">AD</div>
+      <div>
+        <div class="admin-name">Admin User</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-heading" id="page-heading">Dashboard Overview</div>
+      <div class="page-sub" id="page-sub">Tuesday, March 24, 2026 — Dhaka Pilot Zone</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-badge">Pilot Phase Active</div>
+      <button style="background:var(--g600);color:white;border:none;border-radius:9px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Add User</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-header">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="stat-badge up">↑ 14%</div>
+          </div>
+          <div class="stat-value">2,341</div>
+          <div class="stat-label">Total Registered Users</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-header">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 12 8 9 12 15 16 11 19 14 21 10"/></svg>
+            </div>
+            <div class="stat-badge up">↑ 22%</div>
+          </div>
+          <div class="stat-value">487t</div>
+          <div class="stat-label">Total Waste Collected</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-header">
+            <div class="stat-icon amber">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="stat-badge up">↑ 8%</div>
+          </div>
+          <div class="stat-value">৳9.2M</div>
+          <div class="stat-label">Revenue (This Month)</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-header">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/></svg>
+            </div>
+            <div class="stat-badge down">12 pending</div>
+          </div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Pending Pickups</div>
+        </div>
+      </div>
+
+      <div class="three-col">
+        <!-- Waste Chart -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Waste Collection (This Week)</div>
+              <div class="panel-sub">Tons collected per day across Dhaka zones</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="chart-placeholder">
+              <div class="bar-item"><div class="bar-fill" style="height:40px"></div><div class="bar-label">Mon</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:65px"></div><div class="bar-label">Tue</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:50px"></div><div class="bar-label">Wed</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:85px; background:var(--g500)"></div><div class="bar-label">Thu</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:72px"></div><div class="bar-label">Fri</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:55px"></div><div class="bar-label">Sat</div></div>
+              <div class="bar-item"><div class="bar-fill" style="height:30px; background:var(--g200)"></div><div class="bar-label">Sun</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Environmental Impact</div>
+          </div>
+          <div class="panel-body">
+            <div class="metric-row">
+              <div class="metric-mini"><div class="val">3.2t</div><div class="lbl">CO₂ Reduced</div></div>
+              <div class="metric-mini"><div class="val">847</div><div class="lbl">Active Today</div></div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-mini"><div class="val">142k</div><div class="lbl">Green Points Awarded</div></div>
+              <div class="metric-mini"><div class="val">68</div><div class="lbl">Active Bins</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Recent Users</div>
+            <div class="panel-sub">Showing 5 most recently active users</div>
+          </div>
+          <button class="panel-action" onclick="showModal()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Credit Points
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Phone</th>
+              <th>Green Points</th>
+              <th>Waste Kg</th>
+              <th>Pickups</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="user-cell"><div class="user-av">JH</div><div><div class="user-name">Jakir Hossain Joy</div><div class="user-area">West Razabazar</div></div></div></td>
+              <td style="color:var(--muted)">+880 1707370333</td>
+              <td><span class="pts-badge">35,000</span></td>
+              <td>12.5 kg</td>
+              <td>24</td>
+              <td><span class="status-pill active">Active</span></td>
+              <td><button class="credit-btn" onclick="showModal()">+ Credit</button></td>
+            </tr>
+            <tr>
+              <td><div class="user-cell"><div class="user-av">MR</div><div><div class="user-name">Mohammed Rahim</div><div class="user-area">Mirpur-10</div></div></div></td>
+              <td style="color:var(--muted)">+880 1812345678</td>
+              <td><span class="pts-badge">28,500</span></td>
+              <td>9.8 kg</td>
+              <td>19</td>
+              <td><span class="status-pill active">Active</span></td>
+              <td><button class="credit-btn" onclick="showModal()">+ Credit</button></td>
+            </tr>
+            <tr>
+              <td><div class="user-cell"><div class="user-av">FA</div><div><div class="user-name">Fatima Akter</div><div class="user-area">Dhanmondi</div></div></div></td>
+              <td style="color:var(--muted)">+880 1987654321</td>
+              <td><span class="pts-badge">41,200</span></td>
+              <td>18.2 kg</td>
+              <td>31</td>
+              <td><span class="status-pill active">Active</span></td>
+              <td><button class="credit-btn" onclick="showModal()">+ Credit</button></td>
+            </tr>
+            <tr>
+              <td><div class="user-cell"><div class="user-av">KI</div><div><div class="user-name">Karim Islam</div><div class="user-area">Gulshan</div></div></div></td>
+              <td style="color:var(--muted)">+880 1655443322</td>
+              <td><span class="pts-badge">15,800</span></td>
+              <td>6.3 kg</td>
+              <td>11</td>
+              <td><span class="status-pill pending">Inactive</span></td>
+              <td><button class="credit-btn" onclick="showModal()">+ Credit</button></td>
+            </tr>
+            <tr>
+              <td><div class="user-cell"><div class="user-av">SB</div><div><div class="user-name">Sultana Begum</div><div class="user-area">Rayer Bazar</div></div></div></td>
+              <td style="color:var(--muted)">+880 1744556677</td>
+              <td><span class="pts-badge">22,100</span></td>
+              <td>8.1 kg</td>
+              <td>16</td>
+              <td><span class="status-pill active">Active</span></td>
+              <td><button class="credit-btn" onclick="showModal()">+ Credit</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS SECTION -->
+    <div id="section-users" style="display:none">
+      <div class="panel">
+        <div class="panel-header">
+          <div><div class="panel-title">All Users</div><div class="panel-sub">2,341 registered users in pilot zone</div></div>
+          <button class="panel-action" onclick="showModal()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Manual Credit
+          </button>
+        </div>
+        <table>
+          <thead><tr><th>User</th><th>Phone</th><th>Green Points</th><th>Waste (kg)</th><th>CO₂ Saved</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><div class="user-cell"><div class="user-av">JH</div><div><div class="user-name">Jakir Hossain Joy</div><div class="user-area">West Razabazar</div></div></div></td><td style="color:var(--muted)">+880 1707370333</td><td><span class="pts-badge">35,000</span></td><td>12.5</td><td>4.2 kg</td><td style="color:var(--muted)">Nov 1, 2025</td><td><span class="status-pill active">Active</span></td><td><button class="credit-btn" onclick="showModal()">+ Credit</button></td></tr>
+            <tr><td><div class="user-cell"><div class="user-av">MR</div><div><div class="user-name">Mohammed Rahim</div><div class="user-area">Mirpur-10</div></div></div></td><td style="color:var(--muted)">+880 1812345678</td><td><span class="pts-badge">28,500</span></td><td>9.8</td><td>3.1 kg</td><td style="color:var(--muted)">Nov 3, 2025</td><td><span class="status-pill active">Active</span></td><td><button class="credit-btn" onclick="showModal()">+ Credit</button></td></tr>
+            <tr><td><div class="user-cell"><div class="user-av">FA</div><div><div class="user-name">Fatima Akter</div><div class="user-area">Dhanmondi</div></div></div></td><td style="color:var(--muted)">+880 1987654321</td><td><span class="pts-badge">41,200</span></td><td>18.2</td><td>6.8 kg</td><td style="color:var(--muted)">Oct 28, 2025</td><td><span class="status-pill active">Active</span></td><td><button class="credit-btn" onclick="showModal()">+ Credit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PICKUPS SECTION -->
+    <div id="section-pickups" style="display:none">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div><div class="panel-title">Pending Pickups</div><div class="panel-sub">12 requests awaiting assignment</div></div>
+            <button class="panel-action">Assign All</button>
+          </div>
+          <div class="panel-body">
+            <div class="pickup-item">
+              <div class="pickup-num">1</div>
+              <div style="flex:1">
+                <div class="pickup-name">Jakir Hossain Joy</div>
+                <div class="pickup-area">Road 5, House 12, West Razabazar · Today 10:00 AM</div>
+                <div class="pickup-types"><span class="type-tag">Plastic</span><span class="type-tag">Paper</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <button style="background:var(--g600);color:white;border:none;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font)">Assign</button>
+                <button style="background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:10px;cursor:pointer;font-family:var(--font)">View</button>
+              </div>
+            </div>
+            <div class="pickup-item">
+              <div class="pickup-num">2</div>
+              <div style="flex:1">
+                <div class="pickup-name">Fatima Akter</div>
+                <div class="pickup-area">Dhanmondi 27 · Today 2:00 PM</div>
+                <div class="pickup-types"><span class="type-tag">Food</span><span class="type-tag">Glass</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <button style="background:var(--g600);color:white;border:none;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font)">Assign</button>
+                <button style="background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:10px;cursor:pointer;font-family:var(--font)">View</button>
+              </div>
+            </div>
+            <div class="pickup-item">
+              <div class="pickup-num">3</div>
+              <div style="flex:1">
+                <div class="pickup-name">Karim Islam</div>
+                <div class="pickup-area">Gulshan 2, Block B · Tomorrow 9:00 AM</div>
+                <div class="pickup-types"><span class="type-tag">Metal</span><span class="type-tag">Textile</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <button style="background:var(--g600);color:white;border:none;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font)">Assign</button>
+                <button style="background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:10px;cursor:pointer;font-family:var(--font)">View</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Completed Today</div></div>
+          <table>
+            <thead><tr><th>User</th><th>Area</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Sultana Begum</td><td style="color:var(--muted)">Rayer Bazar</td><td><span class="status-pill completed">Completed</span></td></tr>
+              <tr><td>Rahim Mia</td><td style="color:var(--muted)">Mirpur-1</td><td><span class="status-pill completed">Completed</span></td></tr>
+              <tr><td>Nasrin Khatun</td><td style="color:var(--muted)">Mohammadpur</td><td><span class="status-pill cancelled">Cancelled</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY SECTION -->
+    <div id="section-inventory" style="display:none">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div><div class="panel-title">Product Inventory</div><div class="panel-sub">RE:SAJ Eco-Store stock levels</div></div>
+            <button class="panel-action">+ Add Product</button>
+          </div>
+          <div class="panel-body">
+            <div class="inv-row">
+              <div class="inv-emoji">👕</div>
+              <div style="flex:1"><div class="inv-name">Recycled T-Shirt</div><div class="inv-meta">Upcycled textile · ৳250 / 500 pts</div></div>
+              <div class="stock-bar-wrap"><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:75%"></div></div></div>
+              <div class="inv-right"><div class="inv-stock">150</div><div class="inv-sold">Sold: 43</div></div>
+              <button class="action-dots">⋯</button>
+            </div>
+            <div class="inv-row">
+              <div class="inv-emoji">👜</div>
+              <div style="flex:1"><div class="inv-name">Eco-Bag (MLP)</div><div class="inv-meta">Handloom woven · ৳250 / 500 pts</div></div>
+              <div class="stock-bar-wrap"><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:30%"></div></div></div>
+              <div class="inv-right"><div class="inv-stock">60</div><div class="inv-sold">Sold: 137</div></div>
+              <button class="action-dots">⋯</button>
+            </div>
+            <div class="inv-row">
+              <div class="inv-emoji">📓</div>
+              <div style="flex:1"><div class="inv-name">Recycled Notebook</div><div class="inv-meta">Pulped paper · ৳250 / 500 pts</div></div>
+              <div class="stock-bar-wrap"><div class="stock-bar-bg"><div class="stock-bar-fill med" style="width:55%"></div></div></div>
+              <div class="inv-right"><div class="inv-stock">110</div><div class="inv-sold">Sold: 89</div></div>
+              <button class="action-dots">⋯</button>
+            </div>
+            <div class="inv-row">
+              <div class="inv-emoji">👖</div>
+              <div style="flex:1"><div class="inv-name">Upcycled Pants</div><div class="inv-meta">Textile upcycle · ৳250 / 500 pts</div></div>
+              <div class="stock-bar-wrap"><div class="stock-bar-bg"><div class="stock-bar-fill low" style="width:15%"></div></div></div>
+              <div class="inv-right"><div class="inv-stock" style="color:var(--red)">30</div><div class="inv-sold">Sold: 168</div></div>
+              <button class="action-dots">⋯</button>
+            </div>
+            <div class="inv-row">
+              <div class="inv-emoji">🏠</div>
+              <div style="flex:1"><div class="inv-name">Home Décor Set</div><div class="inv-meta">MLP + Handloom · ৳500 / 1000 pts</div></div>
+              <div class="stock-bar-wrap"><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:60%"></div></div></div>
+              <div class="inv-right"><div class="inv-stock">75</div><div class="inv-sold">Sold: 52</div></div>
+              <button class="action-dots">⋯</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Low Stock Alerts</div></div>
+          <div class="panel-body">
+            <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:20px 0;background:var(--bg);border-radius:10px;margin-bottom:12px">
+              <div style="font-size:24px">⚠️</div>
+              <div style="font-size:12px;font-weight:600;color:var(--red)">Upcycled Pants: 30 left</div>
+              <div style="font-size:11px;color:var(--muted)">Restock recommended</div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Quick Restock</div>
+            <button style="width:100%;background:var(--g600);color:white;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Request Production Batch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS SECTION -->
+    <div id="section-transactions" style="display:none">
+      <div class="panel">
+        <div class="panel-header">
+          <div><div class="panel-title">All Transactions</div><div class="panel-sub">Green credit movements and purchases</div></div>
+          <button class="panel-action" onclick="showModal()">+ Manual Credit</button>
+        </div>
+        <table>
+          <thead><tr><th>User</th><th>Type</th><th>Category</th><th>Points</th><th>Cash (৳)</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Jakir Hossain Joy</td><td><span style="color:var(--g600);font-weight:600">Credit</span></td><td>Waste Pick-up</td><td><span class="pts-badge">+35</span></td><td>—</td><td style="color:var(--muted)">Today 10:00 AM</td><td><span class="status-pill completed">Completed</span></td></tr>
+            <tr><td>Fatima Akter</td><td><span style="color:var(--red);font-weight:600">Debit</span></td><td>Store Purchase</td><td><span class="pts-badge" style="color:var(--red)">-250</span></td><td>250</td><td style="color:var(--muted)">Yesterday</td><td><span class="status-pill completed">Completed</span></td></tr>
+            <tr><td>Mohammed Rahim</td><td><span style="color:var(--g600);font-weight:600">Credit</span></td><td>Weekly Bonus</td><td><span class="pts-badge">+100</span></td><td>—</td><td style="color:var(--muted)">Nov 20</td><td><span class="status-pill completed">Completed</span></td></tr>
+            <tr><td>Karim Islam</td><td><span style="color:var(--g600);font-weight:600">Credit</span></td><td>Quiz Completion</td><td><span class="pts-badge">+50</span></td><td>—</td><td style="color:var(--muted)">Nov 18</td><td><span class="status-pill completed">Completed</span></td></tr>
+            <tr><td>Sultana Begum</td><td><span style="color:var(--blue);font-weight:600">Admin</span></td><td>Manual Credit</td><td><span class="pts-badge">+200</span></td><td>—</td><td style="color:var(--muted)">Nov 15</td><td><span class="status-pill completed">Completed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS SECTION -->
+    <div id="section-reports" style="display:none">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Waste Activity Heatmap</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Last 7 weeks — Dhaka zones</div></div>
+          <div class="panel-body">
+            <div class="heatmap-grid">
+              <div class="hm-cell hm-1">M</div><div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-4"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div>
+              <div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-4"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-1"></div>
+              <div class="hm-cell hm-3"></div><div class="hm-cell hm-4"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-4"></div><div class="hm-cell hm-2"></div>
+              <div class="hm-cell hm-0"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div>
+              <div class="hm-cell hm-4"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-4"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-3"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+              <div style="font-size:9px;color:var(--muted)">Less</div>
+              <div class="hm-cell hm-0" style="width:16px;height:16px"></div>
+              <div class="hm-cell hm-1" style="width:16px;height:16px"></div>
+              <div class="hm-cell hm-2" style="width:16px;height:16px"></div>
+              <div class="hm-cell hm-3" style="width:16px;height:16px"></div>
+              <div class="hm-cell hm-4" style="width:16px;height:16px"></div>
+              <div style="font-size:9px;color:var(--muted)">More</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Waste by Category</div></div>
+          <div class="panel-body">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Plastic</span><span style="font-weight:600;color:var(--g600)">42%</span></div><div style="background:var(--border);height:8px;border-radius:4px"><div style="background:var(--g400);height:8px;border-radius:4px;width:42%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Food</span><span style="font-weight:600;color:var(--amber)">28%</span></div><div style="background:var(--border);height:8px;border-radius:4px"><div style="background:var(--amber);height:8px;border-radius:4px;width:28%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Textile</span><span style="font-weight:600;color:var(--blue)">15%</span></div><div style="background:var(--border);height:8px;border-radius:4px"><div style="background:var(--blue);height:8px;border-radius:4px;width:15%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Paper</span><span style="font-weight:600;color:var(--purple)">10%</span></div><div style="background:var(--border);height:8px;border-radius:4px"><div style="background:var(--purple);height:8px;border-radius:4px;width:10%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Others</span><span style="font-weight:600;color:var(--muted)">5%</span></div><div style="background:var(--border);height:8px;border-radius:4px"><div style="background:var(--muted);height:8px;border-radius:4px;width:5%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CREDIT MODAL -->
+<div class="modal-overlay" id="creditModal" onclick="if(event.target===this) hideModal()">
+  <div class="modal-box">
+    <div class="modal-title">Credit Green Points</div>
+    <div class="modal-sub">Manually award points to a user account</div>
+    <div class="modal-field">
+      <label>Select User</label>
+      <select>
+        <option>Jakir Hossain Joy — West Razabazar</option>
+        <option>Mohammed Rahim — Mirpur-10</option>
+        <option>Fatima Akter — Dhanmondi</option>
+        <option>Sultana Begum — Rayer Bazar</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Points to Credit</label>
+      <input type="number" placeholder="e.g. 200" value=""/>
+    </div>
+    <div class="modal-field">
+      <label>Category</label>
+      <select>
+        <option>Manual Credit (Admin)</option>
+        <option>Bonus Reward</option>
+        <option>Correction</option>
+        <option>Community Event</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Note (optional)</label>
+      <textarea rows="2" placeholder="Reason for credit..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="hideModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="hideModal()">Credit Points</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSection(name) {
+    const sections = ['dashboard', 'users', 'pickups', 'inventory', 'transactions', 'reports'];
+    sections.forEach(s => {
+      const el = document.getElementById('section-' + s);
+      if (el) el.style.display = s === name ? 'block' : 'none';
+    });
+    const navItems = document.querySelectorAll('.nav-item');
+ navItems.forEach(item => {
+  item.classList.remove('active');
+  if(item.getAttribute('onclick') && item.getAttribute('onclick').includes(name)) {
+    item.classList.add('active');
+  }
+ });
+    const headings = {
+      dashboard: ['Dashboard Overview', 'Tuesday, March 24, 2026 — Dhaka Pilot Zone'],
+      users: ['User Management', '2,341 registered users'],
+      pickups: ['Pickup Requests', '12 pending · 3 completed today'],
+      inventory: ['Inventory Management', 'RE:SAJ Eco-Store products'],
+      transactions: ['Transactions', 'Green credit ledger'],
+      reports: ['Reports & Analytics', 'Waste heatmap and category breakdown']
+    };
+    if (headings[name]) {
+      document.getElementById('page-heading').textContent = headings[name][0];
+      document.getElementById('page-sub').textContent = headings[name][1];
+    }
+  }
+  function showModal() {
+    document.getElementById('creditModal').classList.add('show');
+  }
+  function hideModal() {
+    document.getElementById('creditModal').classList.remove('show');
+  }
+</script>
+</body>
+</html>

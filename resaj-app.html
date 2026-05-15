@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RE:SAJ App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1a5c2a;
+    --green-mid: #216b30;
+    --green-main: #2d7a3a;
+    --green-light: #3a9148;
+    --green-pale: #c8e6c9;
+    --green-bg: #e8f5e9;
+    --green-btn: #1b5e20;
+    --accent-gold: #f9a825;
+    --accent-red: #e53935;
+    --white: #ffffff;
+    --text-dark: #1a1a1a;
+    --text-mid: #333;
+    --text-light: #666;
+    --card-bg: #f5fbf5;
+    --border: #c8e6c9;
+    --nav-h: 70px;
+    --header-h: 60px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: #f0f0f0;
+    border-radius: 48px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 0 2px #333, inset 0 0 0 4px #555;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .app {
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== SCREEN MANAGEMENT ===== */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    overflow: hidden;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ===== SCROLLABLE CONTENT ===== */
+  .scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ===== TOP HEADER ===== */
+  .top-header {
+    background: var(--green-dark);
+    padding: 12px 16px 16px;
+    flex-shrink: 0;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a5d6a7, #66bb6a);
+    border: 2px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .avatar svg { width: 28px; height: 28px; fill: var(--green-dark); }
+
+  .user-text .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .user-text .location {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .header-icons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .header-icon-btn {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+  }
+  .header-icon-btn svg { width: 20px; height: 20px; fill: white; }
+
+  .balance-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .balance-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 30px;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .balance-pill .bal-val {
+    background: var(--green-btn);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stat-card {
+    flex: 1;
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stat-icon { font-size: 20px; }
+  .stat-info .stat-label { font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 500; }
+  .stat-info .stat-val {
+    background: var(--green-btn);
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin-top: 2px;
+    display: inline-block;
+  }
+
+  .tagline {
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--white);
+    background: rgba(0,0,0,0.2);
+    padding: 6px;
+    border-radius: 6px;
+  }
+
+  /* ===== VIDEO BANNER ===== */
+  .video-banner {
+    margin: 12px 14px;
+    background: #d4ecd4;
+    border-radius: 14px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--green-pale);
+    cursor: pointer;
+  }
+  .play-btn {
+    width: 60px; height: 60px;
+    background: rgba(150,150,150,0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .play-btn svg { width: 28px; height: 28px; fill: white; margin-left: 4px; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-align: center;
+    margin: 4px 0 10px;
+    position: relative;
+  }
+  .section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2.5px;
+    background: var(--green-dark);
+    border-radius: 2px;
+    margin: 4px auto 0;
+  }
+
+  /* ===== QUICK ACTIONS ===== */
+  .quick-actions {
+    padding: 0 14px 6px;
+  }
+  .qa-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .qa-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .qa-icon {
+    width: 58px; height: 58px;
+    background: var(--green-dark);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+  }
+  .qa-icon:active { transform: scale(0.92); }
+  .qa-icon svg { width: 30px; height: 30px; fill: white; }
+  .qa-icon.report { background: var(--green-dark); }
+  .qa-icon.report svg { fill: var(--accent-gold); }
+  .qa-label { font-size: 11px; font-weight: 600; color: var(--text-dark); }
+
+  /* ===== SERVICES ===== */
+  .services-section { padding: 0 14px 6px; }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .svc-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .svc-icon {
+    width: 58px; height: 58px;
+    background: var(--green-dark);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+  }
+  .svc-icon:active { transform: scale(0.92); }
+  .svc-icon svg { width: 28px; height: 28px; fill: white; }
+  .svc-label { font-size: 11px; font-weight: 600; color: var(--text-dark); }
+
+  /* ===== PRODUCTS ===== */
+  .products-section { padding: 0 14px 80px; }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .product-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .product-card:active { transform: scale(0.96); }
+  .product-img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .product-info {
+    background: var(--green-dark);
+    padding: 5px 6px;
+    text-align: center;
+  }
+  .product-name { font-size: 10px; font-weight: 600; color: white; }
+  .product-price {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    display: inline-block;
+    margin-top: 3px;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    height: var(--nav-h);
+    background: var(--green-btn);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    border-radius: 0 0 0 0;
+    padding: 0 8px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 12px;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .nav-item.active { background: rgba(255,255,255,0.15); }
+  .nav-item svg { width: 22px; height: 22px; fill: rgba(255,255,255,0.7); }
+  .nav-item.active svg { fill: white; }
+  .nav-item .nav-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .nav-item.active .nav-label { color: white; }
+  .nav-scan-wrap {
+    width: 52px; height: 52px;
+    background: var(--green-light);
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -10px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-scan-wrap svg { width: 26px; height: 26px; fill: white; }
+
+  /* ===== SUB-SCREEN HEADER ===== */
+  .sub-header {
+    background: var(--green-dark);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .back-btn svg { width: 18px; height: 18px; fill: white; }
+  .sub-header-title { font-size: 18px; font-weight: 700; color: white; flex: 1; text-align: center; }
+  .sub-header-right { width: 34px; display: flex; justify-content: flex-end; }
+  .cart-btn {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+  .cart-btn svg { width: 20px; height: 20px; fill: white; }
+  .cart-badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 14px; height: 14px;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== STORE SCREEN ===== */
+  .store-search {
+    margin: 12px 14px 8px;
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 30px;
+    border: 1.5px solid var(--border);
+    padding: 8px 16px;
+    gap: 8px;
+  }
+  .store-search svg { width: 18px; height: 18px; fill: #999; flex-shrink: 0; }
+  .store-search input {
+    border: none;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: var(--text-dark);
+    outline: none;
+    flex: 1;
+  }
+
+  .store-banner {
+    margin: 0 14px 12px;
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .store-banner h2 { font-size: 20px; font-weight: 800; color: white; }
+  .store-banner p { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+  .recycled-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 14px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .category-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--green-dark);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green-dark);
+    white-space: nowrap;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .cat-tab.active {
+    background: var(--green-dark);
+    color: white;
+  }
+
+  .store-products-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 14px 80px;
+  }
+  .store-product-card {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+  }
+  .store-product-img {
+    width: 100%;
+    height: 130px;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .store-product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .store-product-info {
+    background: var(--green-dark);
+    padding: 8px 10px;
+  }
+  .store-product-name { font-size: 13px; font-weight: 600; color: white; }
+  .store-product-price { font-size: 15px; font-weight: 800; color: var(--accent-gold); }
+  .add-cart-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 20px;
+    padding: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    margin-top: 6px;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.15s;
+  }
+  .add-cart-btn:active { background: rgba(255,255,255,0.2); }
+
+  /* ===== SCAN SCREEN ===== */
+  .scan-area {
+    margin: 16px 20px;
+    background: #e8f5e9;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid var(--green-pale);
+  }
+  .qr-frame {
+    width: 200px; height: 200px;
+    background: linear-gradient(135deg, #1a5c2a, #2d7a3a);
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .qr-inner {
+    width: 160px; height: 160px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-line { width: 100%; height: 8px; background: rgba(200,255,200,0.4); border-radius: 4px; }
+  .qr-scanner-line {
+    position: absolute;
+    width: 80%;
+    height: 2px;
+    background: rgba(100,255,100,0.7);
+    top: 50%;
+    animation: scan-anim 2s ease-in-out infinite;
+  }
+  @keyframes scan-anim { 0%,100%{top:20%} 50%{top:80%} }
+  .qr-corners {
+    position: absolute;
+    inset: 8px;
+    border-radius: 8px;
+  }
+  .scan-instruction { font-size: 15px; font-weight: 700; color: var(--green-dark); text-align: center; }
+  .scan-sub { font-size: 11px; color: var(--text-light); text-align: center; margin-top: 4px; }
+
+  .scan-tools {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .scan-tool-btn {
+    width: 40px; height: 40px;
+    background: var(--green-dark);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .scan-tool-btn svg { width: 20px; height: 20px; fill: white; }
+
+  .how-to-box {
+    margin: 0 14px 12px;
+    background: var(--green-dark);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .how-to-box h3 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
+  .how-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .step-num {
+    width: 24px; height: 24px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .step-text { font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 500; line-height: 1.4; }
+
+  .txn-history-box {
+    margin: 0 14px 80px;
+    background: var(--green-dark);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .txn-history-box h3 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
+  .txn-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .txn-item:last-child { border-bottom: none; }
+  .txn-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .txn-icon svg { width: 18px; height: 18px; fill: white; }
+  .txn-name { font-size: 12px; font-weight: 600; color: white; }
+  .txn-time { font-size: 10px; color: rgba(255,255,255,0.6); }
+
+  /* ===== ACHIEVEMENT SCREEN ===== */
+  .achievement-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px 0;
+    flex-shrink: 0;
+  }
+  .ach-tab {
+    flex: 1;
+    padding: 8px 6px;
+    border-radius: 20px;
+    border: 1.5px solid var(--green-dark);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green-dark);
+    cursor: pointer;
+    background: transparent;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'Poppins',sans-serif;
+  }
+  .ach-tab.active { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+
+  .user-rank-card {
+    margin: 12px 14px;
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+  }
+  .rank-avatar {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rank-avatar svg { width: 30px; height: 30px; fill: white; }
+  .rank-name { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
+  .rank-stats { display: flex; gap: 1px; }
+  .rank-stat {
+    flex: 1;
+    background: white;
+    padding: 8px 4px;
+    text-align: center;
+  }
+  .rank-stat:first-child { border-radius: 10px 0 0 10px; }
+  .rank-stat:last-child { border-radius: 0 10px 10px 0; }
+  .rank-stat .rs-icon { font-size: 20px; margin-bottom: 4px; }
+  .rank-stat .rs-label { font-size: 9px; color: var(--text-light); font-weight: 500; }
+  .rank-stat .rs-val { font-size: 13px; font-weight: 800; color: var(--green-dark); }
+
+  .time-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 14px 10px;
+  }
+  .time-tab {
+    flex: 1;
+    padding: 6px;
+    border-radius: 20px;
+    border: 1.5px solid var(--green-dark);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green-dark);
+    cursor: pointer;
+    background: transparent;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+  }
+  .time-tab.active { background: var(--green-dark); color: white; }
+
+  .podium-box {
+    margin: 0 14px 12px;
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .podium-top3 {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .podium-person {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .podium-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .podium-avatar svg { width: 26px; height: 26px; fill: white; }
+  .crown { position: absolute; top: -14px; font-size: 16px; }
+  .podium-pname { font-size: 10px; font-weight: 700; color: white; }
+  .podium-pts { font-size: 9px; color: rgba(255,255,255,0.7); }
+  .podium-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px 6px 0 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.4);
+  }
+  .podium-1 { width: 70px; height: 80px; background: rgba(255,255,255,0.25); }
+  .podium-2 { width: 60px; height: 60px; background: rgba(255,255,255,0.15); }
+  .podium-3 { width: 60px; height: 50px; background: rgba(255,255,255,0.12); }
+
+  .leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+  .lb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 8px 12px;
+  }
+  .lb-rank { font-size: 13px; font-weight: 800; color: var(--green-dark); width: 18px; }
+  .lb-avatar {
+    width: 28px; height: 28px;
+    background: var(--green-pale);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lb-avatar svg { width: 16px; height: 16px; fill: var(--green-dark); }
+  .lb-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-dark); }
+  .lb-pts {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* BADGES TAB */
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .badge-icon-wrap {
+    width: 64px; height: 64px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .badge-icon-wrap.earned { opacity: 1; }
+  .badge-icon-wrap.locked { background: #ccc !important; opacity: 0.6; }
+  .badge-name { font-size: 10px; font-weight: 600; color: var(--text-dark); text-align: center; }
+
+  .how-earn-box {
+    margin: 0 14px 80px;
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 14px;
+  }
+  .how-earn-box h3 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
+  .earn-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-bottom: 7px;
+  }
+  .earn-icon { font-size: 24px; flex-shrink: 0; }
+  .earn-name { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+  .earn-desc { font-size: 10px; color: var(--text-light); }
+  .earned-badge {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* QUIZ TAB */
+  .quiz-section { padding: 12px 14px 0; }
+  .quiz-section h3 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+  .quiz-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0f9f1;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .quiz-icon { font-size: 28px; flex-shrink: 0; }
+  .quiz-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .quiz-count { font-size: 11px; color: var(--text-light); }
+  .quiz-chevron { margin-left: auto; }
+  .quiz-chevron svg { width: 16px; height: 16px; fill: var(--green-dark); }
+
+  .tasks-section { padding: 12px 14px 0; }
+  .tasks-section h3 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+  .task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0f9f1;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .task-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .task-time { font-size: 10px; color: var(--text-light); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .task-time svg { width: 12px; height: 12px; fill: var(--text-light); }
+  .task-pts {
+    background: var(--accent-gold);
+    color: var(--green-dark);
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .awareness-box {
+    margin: 12px 14px 80px;
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  .awareness-box h3 { font-size: 15px; font-weight: 700; color: white; margin-bottom: 6px; }
+  .awareness-box p { font-size: 11px; color: rgba(255,255,255,0.8); margin-bottom: 12px; line-height: 1.5; }
+  .explore-btn {
+    display: block;
+    background: white;
+    border: none;
+    border-radius: 24px;
+    padding: 10px;
+    width: 100%;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green-dark);
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* ===== WALLET SCREEN ===== */
+  .wallet-header {
+    background: var(--green-dark);
+    padding: 16px 14px;
+    flex-shrink: 0;
+  }
+  .wallet-balance-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .wb-label { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .wb-label svg { width: 18px; height: 18px; fill: white; }
+  .wb-amount { font-size: 32px; font-weight: 800; color: white; margin: 6px 0; }
+  .wb-points-row { display: flex; align-items: center; gap: 8px; }
+  .wb-pts-label { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .wb-pts-val { font-size: 16px; font-weight: 800; color: white; }
+
+  .convert-banner {
+    margin: 12px 14px;
+    background: linear-gradient(135deg, var(--accent-gold), #f57f17);
+    border-radius: 14px;
+    padding: 12px 16px;
+  }
+  .convert-banner h3 { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+  .convert-banner p { font-size: 11px; color: rgba(0,0,0,0.6); margin-top: 2px; }
+
+  .wallet-actions {
+    display: flex;
+    gap: 10px;
+    padding: 0 14px 12px;
+  }
+  .wallet-action-btn {
+    flex: 1;
+    background: var(--green-btn);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    font-family: 'Poppins', sans-serif;
+  }
+  .wallet-action-btn:active { opacity: 0.8; }
+  .wallet-action-btn svg { width: 20px; height: 20px; fill: white; }
+  .wallet-action-btn span { font-size: 11px; font-weight: 600; color: white; }
+
+  .wallet-totals {
+    display: flex;
+    gap: 10px;
+    padding: 0 14px 12px;
+  }
+  .total-card {
+    flex: 1;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .total-card.earned { background: #e8f5e9; }
+  .total-card.spent { background: #ffebee; }
+  .total-arrow { font-size: 18px; }
+  .total-label { font-size: 10px; color: var(--text-light); font-weight: 500; }
+  .total-val { font-size: 17px; font-weight: 800; color: var(--text-dark); }
+
+  .txn-history-wallet {
+    margin: 0 14px 80px;
+    background: var(--green-dark);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .txn-history-wallet h3 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
+  .wallet-txn-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .wallet-txn-item:last-child { border-bottom: none; }
+  .wtxn-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wtxn-icon.income { background: rgba(100,255,100,0.2); }
+  .wtxn-icon.expense { background: rgba(255,100,100,0.2); }
+  .wtxn-icon svg { width: 18px; height: 18px; }
+  .wtxn-icon.income svg { fill: #69f0ae; }
+  .wtxn-icon.expense svg { fill: #ff8a80; }
+  .wtxn-name { font-size: 12px; font-weight: 600; color: white; }
+  .wtxn-date { font-size: 10px; color: rgba(255,255,255,0.6); }
+
+  /* ===== PROFILE SCREEN ===== */
+  .profile-header {
+    background: var(--green-dark);
+    padding: 20px 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .profile-avatar-big {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.5);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .profile-avatar-big svg { width: 48px; height: 48px; fill: white; }
+  .profile-name { font-size: 18px; font-weight: 700; color: white; }
+  .profile-loc { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .profile-stats-row {
+    display: flex;
+    gap: 1px;
+    margin-top: 14px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .ps-stat { flex: 1; padding: 10px 4px; text-align: center; }
+  .ps-val { font-size: 16px; font-weight: 800; color: white; }
+  .ps-label { font-size: 10px; color: rgba(255,255,255,0.7); }
+
+  .profile-menu { padding: 12px 14px 80px; }
+  .profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    background: #f8fdf8;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .pmi-icon {
+    width: 36px; height: 36px;
+    background: var(--green-pale);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pmi-icon svg { width: 20px; height: 20px; fill: var(--green-dark); }
+  .pmi-text { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-dark); }
+  .pmi-chevron svg { width: 16px; height: 16px; fill: #999; }
+
+  /* ===== NOTIFICATION SCREEN ===== */
+  .notif-list { padding: 12px 14px 80px; }
+  .notif-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background: #f8fdf8;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .notif-item.unread { background: #e8f5e9; border-color: var(--green-light); }
+  .notif-icon {
+    width: 38px; height: 38px;
+    background: var(--green-dark);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .notif-icon svg { width: 20px; height: 20px; fill: white; }
+  .notif-title { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .notif-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; line-height: 1.4; }
+  .notif-time { font-size: 10px; color: #aaa; margin-top: 4px; }
+  .unread-dot {
+    width: 8px; height: 8px;
+    background: var(--green-light);
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  /* ===== MENU SCREEN ===== */
+  .menu-header-section {
+    background: var(--green-dark);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .menu-avatar {
+    width: 50px; height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-avatar svg { width: 30px; height: 30px; fill: white; }
+  .menu-user-name { font-size: 16px; font-weight: 700; color: white; }
+  .menu-user-loc { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .menu-list { padding: 12px 14px 80px; }
+  .menu-section-title { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 8px; }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: background 0.12s;
+  }
+  .menu-item:hover { background: var(--green-bg); }
+  .menu-item-icon {
+    width: 38px; height: 38px;
+    background: var(--green-pale);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-item-icon svg { width: 20px; height: 20px; fill: var(--green-dark); }
+  .menu-item-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-dark); }
+  .menu-badge {
+    background: var(--accent-red);
+    color: white;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* ===== SERVICE SCREENS ===== */
+  .service-content { padding: 14px 14px 80px; }
+  .service-banner {
+    background: var(--green-dark);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .service-banner-icon { font-size: 40px; }
+  .service-banner h2 { font-size: 17px; font-weight: 700; color: white; }
+  .service-banner p { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+
+  .service-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .service-option-card {
+    background: var(--green-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+  }
+  .service-option-card:active { background: var(--green-pale); }
+  .soc-icon { font-size: 32px; margin-bottom: 6px; }
+  .soc-name { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+  .soc-desc { font-size: 10px; color: var(--text-light); margin-top: 3px; }
+
+  .service-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8fdf8;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .sli-icon { font-size: 28px; flex-shrink: 0; }
+  .sli-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .sli-desc { font-size: 11px; color: var(--text-light); }
+  .sli-action {
+    margin-left: auto;
+    background: var(--green-dark);
+    color: white;
+    border-radius: 10px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* ===== PICKUP / SCHEDULE SCREENS ===== */
+  .pickup-form { padding: 14px 14px 80px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%;
+    background: #f5f5f5;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--green-dark); }
+  .form-select {
+    width: 100%;
+    background: #f5f5f5;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    outline: none;
+    appearance: none;
+  }
+  .submit-btn {
+    display: block;
+    width: 100%;
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 8px;
+  }
+
+  .schedule-list { padding: 14px 14px 80px; }
+  .schedule-item {
+    display: flex;
+    gap: 12px;
+    background: var(--green-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .schedule-date {
+    background: var(--green-dark);
+    border-radius: 10px;
+    padding: 8px;
+    text-align: center;
+    min-width: 48px;
+    flex-shrink: 0;
+  }
+  .schedule-date .day { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .schedule-date .num { font-size: 20px; font-weight: 800; color: white; line-height: 1; }
+  .schedule-info .sched-title { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .schedule-info .sched-detail { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+  .sched-status {
+    margin-left: auto;
+    align-self: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .sched-status.pending { background: #fff3e0; color: #e65100; }
+  .sched-status.confirmed { background: #e8f5e9; color: var(--green-dark); }
+
+  /* ===== REPORT SCREEN ===== */
+  .report-form { padding: 14px 14px 80px; }
+  .report-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .report-type-card {
+    background: var(--green-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .report-type-card.selected { background: var(--green-dark); border-color: var(--green-dark); }
+  .report-type-card .rt-icon { font-size: 28px; margin-bottom: 5px; }
+  .report-type-card .rt-name { font-size: 12px; font-weight: 600; color: var(--text-dark); }
+  .report-type-card.selected .rt-name { color: white; }
+
+  /* HELP SCREEN */
+  .help-content { padding: 14px 14px 80px; }
+  .faq-item {
+    background: var(--green-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .faq-q { font-size: 13px; font-weight: 600; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; }
+  .faq-q svg { width: 16px; height: 16px; fill: var(--green-dark); flex-shrink: 0; }
+  .faq-a { font-size: 12px; color: var(--text-light); margin-top: 8px; line-height: 1.5; display: none; }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green-btn);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+<div class="app">
+
+<!-- =================== HOME SCREEN =================== -->
+<div class="screen active" id="screen-home">
+  <!-- Top Header -->
+  <div class="top-header">
+    <div class="header-row">
+      <div class="user-info">
+        <div class="avatar" onclick="showScreen('screen-profile')">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </div>
+        <div class="user-text">
+          <div class="name">JAKIR HOSSAIN JOY</div>
+          <div class="location">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="rgba(255,255,255,0.8)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            West Razabazar, Dhaka
+          </div>
+        </div>
+      </div>
+      <div class="header-icons">
+        <button class="header-icon-btn" onclick="showScreen('screen-notifications')">
+          <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        </button>
+        <button class="header-icon-btn" onclick="showScreen('screen-menu')">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="balance-row">
+      <div class="balance-pill">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72zM20 9v6h-7V9h7zM5 19V5h14v2h-6c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h6v2H5z"/><circle cx="16" cy="12" r="1.5"/></svg>
+        Balance
+        <div class="bal-val">350</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+  <svg viewBox="0 0 100 100" width="100%" height="100%" fill="white">
+    <mask id="co2-mask">
+      <rect width="100" height="100" fill="white" />
+      <path d="M 32 58 v 17 h -4 l 8 10 l 8 -10 h -4 v -17 z" fill="white" stroke="white" stroke-width="4" stroke-linejoin="round" />
+      <path d="M 60 58 v 17 h -4 l 8 10 l 8 -10 h -4 v -17 z" fill="white" stroke="white" stroke-width="4" stroke-linejoin="round" />
+    </mask>
+    
+    <path mask="url(#co2-mask)" d="M 25 65 A 15 15 0 0 1 25 35 A 25 25 0 0 1 75 35 A 15 15 0 0 1 75 65 Z" fill="white" stroke="white" stroke-width="6" stroke-linejoin="round"/>
+    
+    <text x="50" y="46" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="currentColor" text-anchor="middle">CO<tspan dy="4" font-size="11" font-weight="bold">2</tspan></text>
+    
+    <path d="M 32 60 v 15 h -4 l 8 10 l 8 -10 h -4 v -15 z" fill="white"/>
+    <path d="M 60 60 v 15 h -4 l 8 10 l 8 -10 h -4 v -15 z" fill="white"/>
+  </svg>
+</div>
+        <div class="stat-info">
+          <div class="stat-label">Save Carbon</div>
+          <div class="stat-val">100 g</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗑️</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Garbage</div>
+          <div class="stat-val">100 g</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tagline">Give Waste & Take Money- Save The Planet, grow Your Wallet</div>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Video Banner -->
+    <div class="video-banner">
+      <div class="play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <div class="section-title">Quick Actions</div>
+      <div class="qa-grid">
+        <div class="qa-item" onclick="showScreen('screen-pickup')">
+          <div class="qa-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-.5 1.5l1.96 2.5H17V9.5h2.5zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2.22-3c-.55-.61-1.36-1-2.22-1s-1.67.39-2.22 1H3V6h12v9H8.22zm9.78 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+          </div>
+          <div class="qa-label">Pick-up</div>
+        </div>
+        <div class="qa-item" onclick="showScreen('screen-schedule')">
+          <div class="qa-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          </div>
+          <div class="qa-label">Schedule</div>
+        </div>
+        <div class="qa-item" onclick="showScreen('screen-help')">
+          <div class="qa-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+          </div>
+          <div class="qa-label">Help</div>
+        </div>
+        <div class="qa-item" onclick="showScreen('screen-report')">
+          <div class="qa-icon report">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="white" stroke-width="1.5"/><path d="M12 9v4M12 17h.01" stroke="#f9a825" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="qa-label">Report</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="services-section" style="margin-top:14px">
+      <div class="section-title">Service's</div>
+      <div class="services-grid">
+        <div class="svc-item" onclick="showScreen('screen-stores')">
+          <div class="svc-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4v2l8 5 8-5V4zM4 20h16V10l-8 5-8-5v10z"/></svg>
+          </div>
+          <div class="svc-label">Store's</div>
+        </div>
+        <div class="svc-item" onclick="showScreen('screen-transport')">
+          <div class="svc-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>
+          </div>
+          <div class="svc-label">Transport</div>
+        </div>
+        <div class="svc-item" onclick="showScreen('screen-restaurant')">
+          <div class="svc-icon">
+            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+          </div>
+          <div class="svc-label">Restaurant</div>
+        </div>
+        <div class="svc-item" onclick="showScreen('screen-travel')">
+          <div class="svc-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg>
+          </div>
+          <div class="svc-label">Travel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RE:SAJ Products -->
+    <div class="products-section" style="margin-top:14px">
+      <div class="section-title">RE:SAJ Products</div>
+      <div class="products-grid">
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">👕</div>
+          <div class="product-info">
+            <div class="product-name">T-shirt</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">🍱</div>
+          <div class="product-info">
+            <div class="product-name">Curtlet</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">👜</div>
+          <div class="product-info">
+            <div class="product-name">Eco-Bag</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">👗</div>
+          <div class="product-info">
+            <div class="product-name">Panjabi</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">🪞</div>
+          <div class="product-info">
+            <div class="product-name">Home Decor</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+        <div class="product-card" onclick="showScreen('screen-store')">
+          <div class="product-img">📔</div>
+          <div class="product-info">
+            <div class="product-name">Notebook</div>
+            <div class="product-price">৳ 250</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="setNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+<div class="nav-item" onclick="showScreen('screen-store'); setNav(this)">
+  <svg viewBox="0 0 100 100" width="24" height="24" fill="currentColor">
+    <mask id="store-mask">
+      <rect width="100" height="100" fill="white" />
+      <rect x="25" y="55" width="20" height="30" fill="black" />
+      <rect x="50" y="55" width="25" height="20" fill="black" />
+      <text x="50" y="31" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="black" text-anchor="middle" letter-spacing="1">STORE</text>
+    </mask>
+    
+    <g mask="url(#store-mask)">
+      <rect x="15" y="85" width="70" height="5" rx="2" />
+      <rect x="20" y="50" width="60" height="35" />
+      <rect x="18" y="15" width="64" height="20" rx="2" />
+      <path d="M18 35h64v10c0 4.42-3.58 8-8 8s-8-3.58-8-8c0 4.42-3.58 8-8 8s-8-3.58-8-8c0 4.42-3.58 8-8 8s-8-3.58-8-8v-10z" />
+    </g>
+  </svg>
+  <span>Store</span>
+</div>
+    <div class="nav-scan-wrap" onclick="showScreen('screen-scan')">
+      <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg>
+    </div>
+    <div class="nav-item" onclick="showScreen('screen-achievement'); setNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zm-15 3V7h2v3.82C4.84 10.4 4 9.3 4 8zm8 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm8-6c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+      <span class="nav-label">Achievement</span>
+    </div>
+    <div class="nav-item" onclick="showScreen('screen-wallet'); setNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72zM20 9v6h-7V9h7zM5 19V5h14v2h-6c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h6v2H5z"/></svg>
+      <span class="nav-label">Wallet</span>
+    </div>
+  </div>
+</div>
+
+<!-- =================== STORE SCREEN =================== -->
+<div class="screen" id="screen-store">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <div class="sub-header-title">RE:SAJ Store</div>
+    <div class="sub-header-right">
+      <button class="cart-btn" onclick="showToast('Cart: 2 items')">
+        <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 5.9 17 7 17h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.47 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <div class="cart-badge">2</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-content">
+    <div class="store-search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="text" placeholder="Search eco-friendly products">
+    </div>
+
+    <div class="store-banner">
+      <h2>Traditional Fusion</h2>
+      <p>Handcrafted Products from recycled materials</p>
+      <div class="recycled-badge">♻️ 100% Recycled</div>
+    </div>
+
+    <div class="category-tabs">
+      <button class="cat-tab active">All</button>
+      <button class="cat-tab">Clothing</button>
+      <button class="cat-tab">Food</button>
+      <button class="cat-tab">Home</button>
+      <button class="cat-tab">Accessories</button>
+    </div>
+
+    <div class="store-products-grid">
+      <div class="store-product-card">
+        <div class="store-product-img">👕</div>
+        <div class="store-product-info">
+          <div class="store-product-name">T-shirt</div>
+          <div class="store-product-price">৳250</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+      <div class="store-product-card">
+        <div class="store-product-img">👖</div>
+        <div class="store-product-info">
+          <div class="store-product-name">Pant</div>
+          <div class="store-product-price">৳250</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+      <div class="store-product-card">
+        <div class="store-product-img">👜</div>
+        <div class="store-product-info">
+          <div class="store-product-name">Recycled Bag</div>
+          <div class="store-product-price">৳250</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+      <div class="store-product-card">
+        <div class="store-product-img">📓</div>
+        <div class="store-product-info">
+          <div class="store-product-name">Recycled notebook</div>
+          <div class="store-product-price">৳250</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+      <div class="store-product-card">
+        <div class="store-product-img">🧣</div>
+        <div class="store-product-info">
+          <div class="store-product-name">Eco Scarf</div>
+          <div class="store-product-price">৳180</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+      <div class="store-product-card">
+        <div class="store-product-img">🪴</div>
+        <div class="store-product-info">
+          <div class="store-product-name">Plant Pot</div>
+          <div class="store-product-price">৳150</div>
+          <button class="add-cart-btn" onclick="showToast('Added to cart!')">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('screen-home'); setNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item active" onclick="setNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>
+      <span class="nav-label">Store</span>
+    </div>
+    <div class="nav-scan-wrap" onclick="showScreen('screen-scan')">
+      <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg>
+    </div>
+    <div class="nav-item" onclick="showScreen('screen-achievement')">
+      <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg>
+      <span class="nav-label">Achievement</span>
+    </div>
+    <div class="nav-item" onclick="showScreen('screen-wallet')">
+      <svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg>
+      <span class="nav-label">Wallet</span>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SCAN SCREEN =================== -->
+<div class="screen" id="screen-scan">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <div class="sub-header-title">Scan QR Code</div>
+    <div class="sub-header-right"></div>
+  </div>
+
+  <div class="scroll-content">
+    <div class="scan-area">
+      <div class="qr-frame">
+        <div class="qr-inner">
+          <div class="qr-line"></div>
+          <div class="qr-line" style="width:60%"></div>
+          <div class="qr-line"></div>
+          <div class="qr-line" style="width:80%"></div>
+        </div>
+        <div class="qr-scanner-line"></div>
+      </div>
+      <div class="scan-instruction">Position QR Code in Frame</div>
+      <div class="scan-sub">Scanning will start automatically</div>
+      <div class="scan-tools">
+        <button class="scan-tool-btn" onclick="showToast('Gallery opened')">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        </button>
+        <button class="scan-tool-btn" onclick="showToast('Flashlight toggled')">
+          <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="how-to-box">
+      <h3>How to Scan</h3>
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Find the QR code on your waste bin or pickup location</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Hold your phone steady and position the code in the frame</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Wait for automatic scanning and earn your green points!</div>
+      </div>
+    </div>
+
+    <div class="txn-history-box">
+      <h3>Transaction History</h3>
+      <div class="txn-item">
+        <div class="txn-icon">
+          <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5z"/></svg>
+        </div>
+        <div>
+          <div class="txn-name">West Razabazar Bin #42</div>
+          <div class="txn-time">2 hours ago</div>
+        </div>
+      </div>
+      <div class="txn-item">
+        <div class="txn-icon">
+          <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5z"/></svg>
+        </div>
+        <div>
+          <div class="txn-name">Collection Point A</div>
+          <div class="txn-time">Yesterday, 10:00 AM</div>
+        </div>
+      </div>
+      <div class="txn-item">
+        <div class="txn-icon">
+          <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5z"/></svg>
+        </div>
+        <div>
+          <div class="txn-name">Community Center Bin</div>
+          <div class="txn-time">Nov 20, 2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-scan-wrap active-scan" style="background:rgba(255,255,255,0.3)" onclick="showToast('Scanner active')">
+      <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg>
+    </div>
+    <div class="nav-item" onclick="showScreen('screen-achievement')"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg><span class="nav-label">Achievement</span></div>
+    <div class="nav-item" onclick="showScreen('screen-wallet')"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg><span class="nav-label">Wallet</span></div>
+  </div>
+</div>
+
+<!-- =================== ACHIEVEMENT SCREEN =================== -->
+<div class="screen" id="screen-achievement">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Achievement</div>
+    <div class="sub-header-right"></div>
+  </div>
+
+  <div class="achievement-tabs">
+    <button class="ach-tab active" onclick="switchAchTab('leaderboard', this)">Leaderboard</button>
+    <button class="ach-tab" onclick="switchAchTab('badge', this)">Badge</button>
+    <button class="ach-tab" onclick="switchAchTab('quiz', this)">Quiz & Task</button>
+  </div>
+
+  <!-- LEADERBOARD TAB -->
+  <div class="scroll-content" id="ach-leaderboard">
+    <div class="user-rank-card">
+      <div class="rank-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg></div>
+      <div class="rank-name">Jakir Hossain Joy</div>
+      <div class="rank-stats">
+        <div class="rank-stat">
+          <div class="rs-icon">⭐</div>
+          <div class="rs-label">Points</div>
+          <div class="rs-val">60,000</div>
+        </div>
+        <div class="rank-stat">
+          <div class="rs-icon">🌐</div>
+          <div class="rs-label">City Rank</div>
+          <div class="rs-val">#9,999</div>
+        </div>
+        <div class="rank-stat">
+          <div class="rs-icon">👥</div>
+          <div class="rs-label">Society Rank</div>
+          <div class="rs-val">#1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-tabs">
+      <button class="time-tab active" onclick="setTimeTab(this)">Daily</button>
+      <button class="time-tab" onclick="setTimeTab(this)">Weekly</button>
+      <button class="time-tab" onclick="setTimeTab(this)">Monthly</button>
+    </div>
+
+    <div class="podium-box">
+      <div class="podium-top3">
+        <div class="podium-person">
+          <div class="podium-avatar"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg></div>
+          <div class="podium-pname">JAKIR</div>
+          <div class="podium-pts">5000 Point</div>
+          <div class="podium-block podium-2">2</div>
+        </div>
+        <div class="podium-person">
+          <div class="podium-avatar" style="border-color:#f9a825">
+            <div class="crown">👑</div>
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg>
+          </div>
+          <div class="podium-pname">HOSSAIN</div>
+          <div class="podium-pts">6000 Point</div>
+          <div class="podium-block podium-1">1</div>
+        </div>
+        <div class="podium-person">
+          <div class="podium-avatar"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg></div>
+          <div class="podium-pname">JOY</div>
+          <div class="podium-pts">4000 Point</div>
+          <div class="podium-block podium-3">3</div>
+        </div>
+      </div>
+      <div class="leaderboard-list">
+        <div class="lb-item"><div class="lb-rank">4.</div><div class="lb-avatar"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="#2d7a3a"/></svg></div><div class="lb-name">JAKIR HOSSAIN JOY</div><div class="lb-pts">3000 Point</div></div>
+        <div class="lb-item"><div class="lb-rank">5.</div><div class="lb-avatar"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="#2d7a3a"/></svg></div><div class="lb-name">JAKIR HOSSAIN JOY</div><div class="lb-pts">2000 Point</div></div>
+        <div class="lb-item"><div class="lb-rank">6.</div><div class="lb-avatar"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="#2d7a3a"/></svg></div><div class="lb-name">JAKIR HOSSAIN JOY</div><div class="lb-pts">1000 Point</div></div>
+      </div>
+    </div>
+    <div style="height:80px"></div>
+  </div>
+
+  <!-- BADGE TAB -->
+  <div class="scroll-content" id="ach-badge" style="display:none">
+    <div style="padding:12px 14px 0"><div class="section-title" style="text-align:left">My Badges</div></div>
+    <div style="margin:0 14px 12px; background:var(--green-dark); border-radius:16px; padding:14px">
+      <div class="badges-grid" style="padding:0">
+        <div class="badge-item"><div class="badge-icon-wrap earned" style="background:#c8b400">⏰</div><div class="badge-name" style="color:white">Early Bird</div></div>
+        <div class="badge-item"><div class="badge-icon-wrap earned" style="background:#388e3c">⭐</div><div class="badge-name" style="color:white">Recycle Star</div></div>
+        <div class="badge-item"><div class="badge-icon-wrap earned" style="background:#37474f">☁️</div><div class="badge-name" style="color:white">Carbon Saver</div></div>
+        <div class="badge-item"><div class="badge-icon-wrap earned" style="background:#6d4c41">🏆</div><div class="badge-name" style="color:white">Waste Warrior</div></div>
+        <div class="badge-item"><div class="badge-icon-wrap earned" style="background:#2e7d32">🏆</div><div class="badge-name" style="color:white">Eco Champion</div></div>
+        <div class="badge-item"><div class="badge-icon-wrap locked" style="background:#388e3c">🔒</div><div class="badge-name" style="color:rgba(255,255,255,0.6)">Green Legend</div></div>
+      </div>
+    </div>
+
+    <div class="how-earn-box">
+      <h3>How to Earn</h3>
+      <div class="earn-item"><div class="earn-icon">⏰</div><div><div class="earn-name">Early Bird</div><div class="earn-desc">Complete 10 morning pick-up</div></div><div class="earned-badge">Earned</div></div>
+      <div class="earn-item"><div class="earn-icon">⭐</div><div><div class="earn-name">Recycle Star</div><div class="earn-desc">Achieve 500 Green Points</div></div><div class="earned-badge">Earned</div></div>
+      <div class="earn-item"><div class="earn-icon">☁️</div><div><div class="earn-name">Carbon Saver</div><div class="earn-desc">Save 5g Carbon Emissions</div></div><div class="earned-badge">Earned</div></div>
+      <div class="earn-item"><div class="earn-icon">🏅</div><div><div class="earn-name">Waste Warrior</div><div class="earn-desc">Recycle 50kg of waste</div></div></div>
+      <div class="earn-item"><div class="earn-icon">🏆</div><div><div class="earn-name">Eco Champion</div><div class="earn-desc">Complete 25 sustainable tasks</div></div></div>
+      <div class="earn-item"><div class="earn-icon">🔒</div><div><div class="earn-name">Green Legend</div><div class="earn-desc">Reach level 6</div></div></div>
+    </div>
+  </div>
+
+  <!-- QUIZ & TASK TAB -->
+  <div class="scroll-content" id="ach-quiz" style="display:none">
+    <div class="quiz-section">
+      <h3>Sustainable Quiz</h3>
+      <div class="quiz-item" onclick="showToast('Sustainable Living Quiz started!')"><div class="quiz-icon">🌱</div><div><div class="quiz-name">Sustanable Living Quiz</div><div class="quiz-count">Eco-friendly • 12 Quizzes</div></div><div class="quiz-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="quiz-item" onclick="showToast('Waste Management Quiz started!')"><div class="quiz-icon">🗑️</div><div><div class="quiz-name">Waste Management quiz</div><div class="quiz-count">Environment • 8 Quizzes</div></div><div class="quiz-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="quiz-item" onclick="showToast('Climate Action Quiz started!')"><div class="quiz-icon">🌍</div><div><div class="quiz-name">Climate Action Quiz</div><div class="quiz-count">Sustainability • 6 Quizzes</div></div><div class="quiz-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+    </div>
+
+    <div class="tasks-section">
+      <h3>Green Environment Tasks</h3>
+      <div class="task-item"><div><div class="task-name">Weekly Recycling Challenge</div><div class="task-time"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Ends in 6d 23h</div></div><div class="task-pts">+50 pts</div></div>
+      <div class="task-item"><div><div class="task-name">Plant a Tree Initiative</div><div class="task-time"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Ends in 10d 5h</div></div><div class="task-pts">+100 pts</div></div>
+      <div class="task-item"><div><div class="task-name">Community Clean-up Drive</div><div class="task-time"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Ends in 3d 12h</div></div><div class="task-pts">+75 pts</div></div>
+    </div>
+
+    <div class="awareness-box">
+      <h3>Join Awareness Programs</h3>
+      <p>Participate in community events and earn bonus points while making a difference!</p>
+      <button class="explore-btn" onclick="showToast('Exploring programs...')">Explore Programs</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-scan-wrap" onclick="showScreen('screen-scan')"><svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg></div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg><span class="nav-label">Achievement</span></div>
+    <div class="nav-item" onclick="showScreen('screen-wallet')"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg><span class="nav-label">Wallet</span></div>
+  </div>
+</div>
+
+<!-- =================== WALLET SCREEN =================== -->
+<div class="screen" id="screen-wallet">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">My Wallet</div>
+    <div class="sub-header-right"></div>
+  </div>
+
+  <div class="scroll-content">
+    <div class="wallet-header">
+      <div class="wallet-balance-card">
+        <div class="wb-label"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg> Available Balance</div>
+        <div class="wb-amount">৳ 350.00</div>
+        <div class="wb-points-row">
+          <div class="wb-pts-label">Earn Green Points</div>
+          <div class="wb-pts-val">35000 Points</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="convert-banner">
+      <h3>Convert Green Points</h3>
+      <p>Exchange your points for cash rewards</p>
+    </div>
+
+    <div class="wallet-actions">
+      <button class="wallet-action-btn" onclick="showToast('Donate initiated')"><svg viewBox="0 0 24 24"><path d="M11 5H6.5C5.12 5 4 6.12 4 7.5S5.12 10 6.5 10H11v1H4v2h7v1H6.5C5.12 14 4 15.12 4 16.5S5.12 19 6.5 19H11v2h2v-2h1c2.76 0 5-2.24 5-5v-4c0-2.76-2.24-5-5-5h-1V3h-2v2zm3 12h-3v-2h3c.55 0 1 .45 1 1s-.45 1-1 1zm0-6h-3V9h3c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg><span>Donate</span></button>
+      <button class="wallet-action-btn" onclick="showToast('Share link copied!')"><svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg><span>Share</span></button>
+      <button class="wallet-action-btn" onclick="showToast('Withdrawal requested')"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg><span>Withdraw</span></button>
+    </div>
+
+    <div class="wallet-totals">
+      <div class="total-card earned"><div class="total-arrow" style="color:#2d7a3a">↗</div><div><div class="total-label">Total Earned</div><div class="total-val">৳ 520</div></div></div>
+      <div class="total-card spent"><div class="total-arrow" style="color:#e53935">↙</div><div><div class="total-label">Total Spent</div><div class="total-val">৳170</div></div></div>
+    </div>
+
+    <div class="txn-history-wallet">
+      <h3>Transaction History</h3>
+      <div class="wallet-txn-item"><div class="wtxn-icon income"><svg viewBox="0 0 24 24"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg></div><div><div class="wtxn-name">Waste Pick-up Reward</div><div class="wtxn-date">Today, 10:00 AM</div></div></div>
+      <div class="wallet-txn-item"><div class="wtxn-icon expense"><svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg></div><div><div class="wtxn-name">Purchased T-Shirt</div><div class="wtxn-date">Yesterday, 10:00 AM</div></div></div>
+      <div class="wallet-txn-item"><div class="wtxn-icon income"><svg viewBox="0 0 24 24"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg></div><div><div class="wtxn-name">Weekly Bonus</div><div class="wtxn-date">Nov 20, 2025</div></div></div>
+      <div class="wallet-txn-item"><div class="wtxn-icon expense"><svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg></div><div><div class="wtxn-name">Transfer to Friend</div><div class="wtxn-date">Nov 18, 2025</div></div></div>
+      <div class="wallet-txn-item"><div class="wtxn-icon income"><svg viewBox="0 0 24 24"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg></div><div><div class="wtxn-name">Quiz Completion</div><div class="wtxn-date">Nov 15, 2025</div></div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-scan-wrap" onclick="showScreen('screen-scan')"><svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg></div>
+    <div class="nav-item" onclick="showScreen('screen-achievement')"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg><span class="nav-label">Achievement</span></div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg><span class="nav-label">Wallet</span></div>
+  </div>
+</div>
+
+<!-- =================== PROFILE SCREEN =================== -->
+<div class="screen" id="screen-profile">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">My Profile</div>
+    <div class="sub-header-right"></div>
+  </div>
+
+  <div class="scroll-content">
+    <div class="profile-header">
+      <div class="profile-avatar-big"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg></div>
+      <div class="profile-name">JAKIR HOSSAIN JOY</div>
+      <div class="profile-loc">📍 West Razabazar, Dhaka</div>
+      <div class="profile-stats-row">
+        <div class="ps-stat"><div class="ps-val">60K</div><div class="ps-label">Points</div></div>
+        <div class="ps-stat"><div class="ps-val">350</div><div class="ps-label">Balance</div></div>
+        <div class="ps-stat"><div class="ps-val">#1</div><div class="ps-label">Rank</div></div>
+        <div class="ps-stat"><div class="ps-val">100g</div><div class="ps-label">CO₂ Saved</div></div>
+      </div>
+    </div>
+
+    <div class="profile-menu">
+      <div class="profile-menu-item" onclick="showToast('Edit Profile')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div><div class="pmi-text">Edit Profile</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showScreen('screen-wallet')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg></div><div class="pmi-text">My Wallet</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showScreen('screen-achievement')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg></div><div class="pmi-text">My Achievements</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showScreen('screen-pickup')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/></svg></div><div class="pmi-text">My Pick-up History</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showToast('Settings opened')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></div><div class="pmi-text">Settings</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showScreen('screen-help')"><div class="pmi-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div><div class="pmi-text">Help & Support</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+      <div class="profile-menu-item" onclick="showToast('Logged out')"><div class="pmi-icon"><svg viewBox="0 0 24 24" style="fill:#e53935"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div><div class="pmi-text" style="color:#e53935">Logout</div><div class="pmi-chevron"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== NOTIFICATIONS SCREEN =================== -->
+<div class="screen" id="screen-notifications">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Notifications</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="notif-list">
+      <div class="notif-item unread"><div class="notif-icon"><svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/></svg></div><div style="flex:1"><div class="notif-title">Pick-up Scheduled!</div><div class="notif-desc">Your waste pick-up for West Razabazar is confirmed for today at 2:00 PM.</div><div class="notif-time">2 hours ago</div></div><div class="unread-dot"></div></div>
+      <div class="notif-item unread"><div class="notif-icon" style="background:#f9a825"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg></div><div style="flex:1"><div class="notif-title">New Badge Earned! 🏆</div><div class="notif-desc">Congratulations! You've earned the "Carbon Saver" badge.</div><div class="notif-time">Yesterday</div></div><div class="unread-dot"></div></div>
+      <div class="notif-item"><div class="notif-icon"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28z"/></svg></div><div style="flex:1"><div class="notif-title">Points Added</div><div class="notif-desc">350 green points have been credited to your wallet!</div><div class="notif-time">Nov 20, 2025</div></div></div>
+      <div class="notif-item"><div class="notif-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div><div style="flex:1"><div class="notif-title">Community Clean-up Drive</div><div class="notif-desc">Join the community clean-up drive this Saturday and earn +75 pts!</div><div class="notif-time">Nov 18, 2025</div></div></div>
+      <div class="notif-item"><div class="notif-icon" style="background:#e53935"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div><div style="flex:1"><div class="notif-title">New Quiz Available!</div><div class="notif-desc">Climate Action Quiz is now live. Answer 6 questions and earn points.</div><div class="notif-time">Nov 15, 2025</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MENU SCREEN =================== -->
+<div class="screen" id="screen-menu">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Menu</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="menu-header-section">
+      <div class="menu-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="white"/></svg></div>
+      <div><div class="menu-user-name">Jakir Hossain Joy</div><div class="menu-user-loc">📍 West Razabazar, Dhaka</div></div>
+    </div>
+    <div class="menu-list">
+      <div class="menu-section-title">Main</div>
+      <div class="menu-item" onclick="showScreen('screen-home')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="menu-item-label">Home</div></div>
+      <div class="menu-item" onclick="showScreen('screen-profile')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div><div class="menu-item-label">My Profile</div></div>
+      <div class="menu-item" onclick="showScreen('screen-notifications')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div><div class="menu-item-label">Notifications</div><div class="menu-badge">2</div></div>
+      <div class="menu-section-title">Services</div>
+      <div class="menu-item" onclick="showScreen('screen-pickup')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/></svg></div><div class="menu-item-label">Waste Pick-up</div></div>
+      <div class="menu-item" onclick="showScreen('screen-schedule')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div><div class="menu-item-label">Schedule</div></div>
+      <div class="menu-item" onclick="showScreen('screen-transport')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10z"/></svg></div><div class="menu-item-label">Transport</div></div>
+      <div class="menu-item" onclick="showScreen('screen-restaurant')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></div><div class="menu-item-label">Restaurant</div></div>
+      <div class="menu-item" onclick="showScreen('screen-travel')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg></div><div class="menu-item-label">Travel</div></div>
+      <div class="menu-section-title">Account</div>
+      <div class="menu-item" onclick="showScreen('screen-wallet')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28z"/></svg></div><div class="menu-item-label">Wallet</div></div>
+      <div class="menu-item" onclick="showScreen('screen-store')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 5.9 17 7 17h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.47 4H5.21l-.94-2H1z"/></svg></div><div class="menu-item-label">RE:SAJ Store</div></div>
+      <div class="menu-item" onclick="showScreen('screen-help')"><div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div><div class="menu-item-label">Help & Support</div></div>
+      <div class="menu-item" onclick="showToast('Logged out!')"><div class="menu-item-icon" style="background:#ffebee"><svg viewBox="0 0 24 24" style="fill:#e53935"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div><div class="menu-item-label" style="color:#e53935">Logout</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PICKUP SCREEN =================== -->
+<div class="screen" id="screen-pickup">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Waste Pick-up</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="pickup-form">
+      <div style="background:var(--green-dark);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:40px">🚛</div>
+        <div><div style="font-size:17px;font-weight:700;color:white">Request a Pick-up</div><div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:4px">We'll collect your waste and reward you with green points</div></div>
+      </div>
+      <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" type="text" value="Jakir Hossain Joy" placeholder="Enter your name"></div>
+      <div class="form-group"><label class="form-label">Pickup Address</label><input class="form-input" type="text" value="West Razabazar, Dhaka" placeholder="Enter address"></div>
+      <div class="form-group"><label class="form-label">Waste Type</label><select class="form-select"><option>Plastic Waste</option><option>Paper/Cardboard</option><option>Metal/Cans</option><option>Glass</option><option>Organic</option><option>Electronics</option></select></div>
+      <div class="form-group"><label class="form-label">Estimated Weight</label><select class="form-select"><option>1-5 kg</option><option>5-10 kg</option><option>10-20 kg</option><option>20+ kg</option></select></div>
+      <div class="form-group"><label class="form-label">Preferred Date</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Preferred Time</label><select class="form-select"><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>2:00 PM - 4:00 PM</option><option>4:00 PM - 6:00 PM</option></select></div>
+      <div class="form-group"><label class="form-label">Notes (optional)</label><textarea class="form-input" rows="3" placeholder="Any special instructions..."></textarea></div>
+      <button class="submit-btn" onclick="showToast('Pick-up request submitted! 🎉')">Request Pick-up</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SCHEDULE SCREEN =================== -->
+<div class="screen" id="screen-schedule">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Pick-up Schedule</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="schedule-list">
+      <div style="background:var(--green-dark);border-radius:16px;padding:14px;margin-bottom:14px;text-align:center">
+        <div style="font-size:14px;font-weight:700;color:white">May 2026</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px">
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">S</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">M</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">T</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">W</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">T</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">F</div><div style="font-size:10px;color:rgba(255,255,255,0.6);text-align:center">S</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);text-align:center">-</div><div style="font-size:11px;color:rgba(255,255,255,0.5);text-align:center">-</div><div style="font-size:11px;color:rgba(255,255,255,0.5);text-align:center">-</div><div style="font-size:11px;color:white;text-align:center">1</div><div style="font-size:11px;color:white;text-align:center">2</div><div style="font-size:11px;color:white;text-align:center">3</div><div style="font-size:11px;color:white;text-align:center">4</div>
+          <div style="font-size:11px;color:white;text-align:center">5</div><div style="font-size:11px;color:white;text-align:center">6</div><div style="font-size:11px;color:white;text-align:center">7</div><div style="font-size:11px;background:rgba(255,255,255,0.2);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:auto;color:white">8</div><div style="font-size:11px;color:white;text-align:center">9</div><div style="font-size:11px;background:var(--accent-gold);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:auto;color:#1a5c2a;font-weight:800">10</div><div style="font-size:11px;color:white;text-align:center">11</div>
+          <div style="font-size:11px;color:white;text-align:center">12</div><div style="font-size:11px;color:white;text-align:center">13</div><div style="font-size:11px;color:white;text-align:center">14</div><div style="font-size:11px;color:white;text-align:center">15</div><div style="font-size:11px;color:white;text-align:center">16</div><div style="font-size:11px;color:white;text-align:center">17</div><div style="font-size:11px;color:white;text-align:center">18</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="text-align:left">Upcoming Pick-ups</div>
+      <div class="schedule-item"><div class="schedule-date"><div class="day">MAY</div><div class="num">10</div></div><div class="schedule-info"><div class="sched-title">Plastic Waste Pick-up</div><div class="sched-detail">West Razabazar • 10:00 AM</div><div class="sched-detail">~5 kg estimated</div></div><div class="sched-status confirmed">Confirmed</div></div>
+      <div class="schedule-item"><div class="schedule-date"><div class="day">MAY</div><div class="num">15</div></div><div class="schedule-info"><div class="sched-title">Paper & Cardboard</div><div class="sched-detail">West Razabazar • 2:00 PM</div><div class="sched-detail">~3 kg estimated</div></div><div class="sched-status pending">Pending</div></div>
+      <div class="schedule-item"><div class="schedule-date"><div class="day">MAY</div><div class="num">22</div></div><div class="schedule-info"><div class="sched-title">Mixed Waste Pick-up</div><div class="sched-detail">West Razabazar • 9:00 AM</div><div class="sched-detail">~8 kg estimated</div></div><div class="sched-status pending">Pending</div></div>
+
+      <button class="submit-btn" onclick="showScreen('screen-pickup')" style="margin-top:8px">+ Schedule New Pick-up</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== HELP SCREEN =================== -->
+<div class="screen" id="screen-help">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Help & Support</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="help-content">
+      <div style="background:var(--green-dark);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center">
+        <div style="font-size:36px;margin-bottom:8px">💬</div>
+        <div style="font-size:16px;font-weight:700;color:white">How can we help?</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">Search or browse FAQs below</div>
+        <div style="margin-top:12px;background:rgba(255,255,255,0.15);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="rgba(255,255,255,0.6)"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
+          <input style="background:transparent;border:none;font-family:Poppins,sans-serif;font-size:13px;color:white;outline:none;flex:1" placeholder="Search FAQ..." onclick="showToast('Search feature')">
+        </div>
+      </div>
+
+      <div class="section-title" style="text-align:left">Frequently Asked Questions</div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I schedule a waste pick-up?<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></div><div class="faq-a">Go to Quick Actions on the home screen and tap "Pick-up". Fill in your address, waste type, and preferred date/time. You'll receive a confirmation notification.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I earn green points?<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></div><div class="faq-a">You earn points by: (1) Scheduling and completing waste pick-ups, (2) Scanning QR codes at waste bins, (3) Completing quizzes and tasks, (4) Participating in community events.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I convert points to cash?<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></div><div class="faq-a">Go to your Wallet screen and tap "Convert Green Points". You can exchange your points for cash rewards at the current exchange rate shown in the app.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What types of waste are accepted?<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></div><div class="faq-a">We accept plastic, paper/cardboard, metal/cans, glass, organic waste, and electronics. The reward rate varies by waste type.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I scan a waste bin QR code?<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></div><div class="faq-a">Tap "Scan" in the bottom navigation. Point your camera at the QR code on any RE:SAJ waste bin. Scanning happens automatically and points are instantly credited.</div></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+        <div style="background:var(--green-bg);border:1.5px solid var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer" onclick="showToast('Live chat opened')">
+          <div style="font-size:28px;margin-bottom:6px">💬</div>
+          <div style="font-size:13px;font-weight:700;color:var(--green-dark)">Live Chat</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px">Available 9AM-6PM</div>
+        </div>
+        <div style="background:var(--green-bg);border:1.5px solid var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer" onclick="showToast('Calling support...')">
+          <div style="font-size:28px;margin-bottom:6px">📞</div>
+          <div style="font-size:13px;font-weight:700;color:var(--green-dark)">Call Us</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px">+880 1XXX-XXXXXX</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== REPORT SCREEN =================== -->
+<div class="screen" id="screen-report">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Report Issue</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="report-form">
+      <div style="background:#fff3e0;border:1.5px solid #ffcc02;border-radius:14px;padding:14px;margin-bottom:16px;display:flex;gap:10px">
+        <div style="font-size:24px">⚠️</div>
+        <div><div style="font-size:13px;font-weight:700;color:#e65100">Report an Issue</div><div style="font-size:11px;color:#bf360c;margin-top:3px">Help us improve our service by reporting problems</div></div>
+      </div>
+
+      <div class="section-title" style="text-align:left;margin-bottom:10px">Report Type</div>
+      <div class="report-type-grid">
+        <div class="report-type-card selected" onclick="selectReportType(this)"><div class="rt-icon">🚛</div><div class="rt-name">Missed Pick-up</div></div>
+        <div class="report-type-card" onclick="selectReportType(this)"><div class="rt-icon">🗑️</div><div class="rt-name">Bin Issue</div></div>
+        <div class="report-type-card" onclick="selectReportType(this)"><div class="rt-icon">💰</div><div class="rt-name">Payment Issue</div></div>
+        <div class="report-type-card" onclick="selectReportType(this)"><div class="rt-icon">📱</div><div class="rt-name">App Problem</div></div>
+      </div>
+
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" rows="4" placeholder="Describe the issue in detail..."></textarea></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" type="text" value="West Razabazar, Dhaka" placeholder="Where did this happen?"></div>
+      <div class="form-group"><label class="form-label">Date of Issue</label><input class="form-input" type="date"></div>
+      <div style="background:var(--green-bg);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;margin-bottom:14px" onclick="showToast('Camera opened')">
+        <div style="font-size:28px;margin-bottom:6px">📷</div>
+        <div style="font-size:13px;font-weight:600;color:var(--green-dark)">Add Photo</div>
+        <div style="font-size:11px;color:var(--text-light)">Tap to upload evidence</div>
+      </div>
+      <button class="submit-btn" onclick="showToast('Report submitted! We\'ll respond within 24h ✅')">Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== TRANSPORT SCREEN =================== -->
+<div class="screen" id="screen-transport">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Eco Transport</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="service-content">
+      <div class="service-banner"><div class="service-banner-icon">🚌</div><div><h2>Eco-Friendly Transport</h2><p>Use green points to ride eco-friendly vehicles</p></div></div>
+      <div class="service-options-grid">
+        <div class="service-option-card" onclick="showToast('E-Rickshaw booked!')"><div class="soc-icon">🛺</div><div class="soc-name">E-Rickshaw</div><div class="soc-desc">Electric rickshaw service</div></div>
+        <div class="service-option-card" onclick="showToast('CNG booked!')"><div class="soc-icon">🚐</div><div class="soc-name">CNG Auto</div><div class="soc-desc">Compressed natural gas</div></div>
+        <div class="service-option-card" onclick="showToast('Bus pass activated!')"><div class="soc-icon">🚌</div><div class="soc-name">Green Bus</div><div class="soc-desc">BRTC eco buses</div></div>
+        <div class="service-option-card" onclick="showToast('Cycle rented!')"><div class="soc-icon">🚴</div><div class="soc-name">Cycle Rental</div><div class="soc-desc">Zero emissions ride</div></div>
+      </div>
+      <div class="section-title" style="text-align:left">Nearby Eco Stops</div>
+      <div class="service-list-item"><div class="sli-icon">🛺</div><div><div class="sli-name">Razabazar CNG Stand</div><div class="sli-desc">0.2 km away • 5 vehicles</div></div><div class="sli-action">Book</div></div>
+      <div class="service-list-item"><div class="sli-icon">🚌</div><div><div class="sli-name">Green Bus Stop #12</div><div class="sli-desc">0.5 km away • Next: 10 min</div></div><div class="sli-action">Track</div></div>
+      <div class="service-list-item"><div class="sli-icon">🚴</div><div><div class="sli-name">Cycle Hub - Paltan</div><div class="sli-desc">1.2 km away • 8 bikes</div></div><div class="sli-action">Rent</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== RESTAURANT SCREEN =================== -->
+<div class="screen" id="screen-restaurant">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Eco Restaurants</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="service-content">
+      <div class="service-banner"><div class="service-banner-icon">🍃</div><div><h2>Green Dining</h2><p>Organic food, zero-waste packaging</p></div></div>
+      <div class="store-search" style="margin:0 0 12px">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
+        <input type="text" placeholder="Search restaurants...">
+      </div>
+      <div class="service-list-item"><div class="sli-icon">🥗</div><div><div class="sli-name">Green Bowl Cafe</div><div class="sli-desc">Organic • 0.8 km • ⭐ 4.8</div></div><div class="sli-action">Order</div></div>
+      <div class="service-list-item"><div class="sli-icon">🌾</div><div><div class="sli-name">Eco Dhaba</div><div class="sli-desc">Farm-to-table • 1.2 km • ⭐ 4.6</div></div><div class="sli-action">Order</div></div>
+      <div class="service-list-item"><div class="sli-icon">🥬</div><div><div class="sli-name">Veggie Paradise</div><div class="sli-desc">Vegan • 2.0 km • ⭐ 4.5</div></div><div class="sli-action">Order</div></div>
+      <div class="service-list-item"><div class="sli-icon">🌿</div><div><div class="sli-name">Nature's Kitchen</div><div class="sli-desc">Zero-waste • 2.5 km • ⭐ 4.7</div></div><div class="sli-action">Order</div></div>
+      <div style="background:var(--green-bg);border:1.5px solid var(--border);border-radius:14px;padding:14px;text-align:center;margin-top:8px">
+        <div style="font-size:20px;margin-bottom:4px">♻️ Use Green Points</div>
+        <div style="font-size:12px;color:var(--text-light)">Pay with your RE:SAJ points at partner restaurants</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== TRAVEL SCREEN =================== -->
+<div class="screen" id="screen-travel">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Eco Travel</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="service-content">
+      <div class="service-banner"><div class="service-banner-icon">✈️</div><div><h2>Eco-Friendly Travel</h2><p>Offset carbon footprint with green points</p></div></div>
+      <div class="service-options-grid">
+        <div class="service-option-card" onclick="showToast('Flight search opened!')"><div class="soc-icon">✈️</div><div class="soc-name">Flights</div><div class="soc-desc">Carbon offset included</div></div>
+        <div class="service-option-card" onclick="showToast('Hotel search opened!')"><div class="soc-icon">🏨</div><div class="soc-name">Eco Hotels</div><div class="soc-desc">Green certified stays</div></div>
+        <div class="service-option-card" onclick="showToast('Tour booked!')"><div class="soc-icon">🌿</div><div class="soc-name">Nature Tours</div><div class="soc-desc">Sustainable tourism</div></div>
+        <div class="service-option-card" onclick="showToast('Train booked!')"><div class="soc-icon">🚂</div><div class="soc-name">Train Travel</div><div class="soc-desc">Low carbon travel</div></div>
+      </div>
+      <div class="section-title" style="text-align:left">Popular Eco Destinations</div>
+      <div class="service-list-item"><div class="sli-icon">🌊</div><div><div class="sli-name">Sundarbans Eco Tour</div><div class="sli-desc">3 days • From ৳150 • Eco certified</div></div><div class="sli-action">Book</div></div>
+      <div class="service-list-item"><div class="sli-icon">🏔️</div><div><div class="sli-name">Chittagong Hill Tracts</div><div class="sli-desc">2 days • From ৳80 • Sustainable</div></div><div class="sli-action">Book</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== STORES SERVICE SCREEN =================== -->
+<div class="screen" id="screen-stores">
+  <div class="sub-header">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="sub-header-title">Eco Stores</div>
+    <div class="sub-header-right"></div>
+  </div>
+  <div class="scroll-content">
+    <div class="service-content">
+      <div class="service-banner"><div class="service-banner-icon">🏪</div><div><h2>Partner Eco Stores</h2><p>Shop with green points at partner stores</p></div></div>
+      <div class="service-list-item" onclick="showScreen('screen-store')"><div class="sli-icon">♻️</div><div><div class="sli-name">RE:SAJ Official Store</div><div class="sli-desc">100% recycled products • Online</div></div><div class="sli-action">Visit</div></div>
+      <div class="service-list-item" onclick="showToast('EcoMart opened!')"><div class="sli-icon">🛒</div><div><div class="sli-name">EcoMart Dhaka</div><div class="sli-desc">Organic groceries • 1.0 km</div></div><div class="sli-action">Visit</div></div>
+      <div class="service-list-item" onclick="showToast('GreenFashion opened!')"><div class="sli-icon">👗</div><div><div class="sli-name">GreenFashion BD</div><div class="sli-desc">Sustainable clothing • 2.2 km</div></div><div class="sli-action">Visit</div></div>
+      <div class="service-list-item" onclick="showToast('EcoHome opened!')"><div class="sli-icon">🏠</div><div><div class="sli-name">EcoHome Supplies</div><div class="sli-desc">Sustainable home goods • 3.0 km</div></div><div class="sli-action">Visit</div></div>
+      <div style="background:var(--green-dark);border-radius:14px;padding:14px;text-align:center;margin-top:8px">
+        <div style="font-size:14px;font-weight:700;color:white;margin-bottom:6px">Become a Partner Store</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:12px">Join the RE:SAJ ecosystem and reach eco-conscious customers</div>
+        <button class="submit-btn" style="background:rgba(255,255,255,0.2);padding:10px" onclick="showToast('Partner registration opened!')">Apply Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+</div>
+</div>
+
+<script>
+  let screenHistory = ['screen-home'];
+  let currentScreen = 'screen-home';
+
+  function showScreen(id) {
+    document.getElementById(currentScreen).classList.remove('active');
+    document.getElementById(id).classList.add('active');
+    if (id !== currentScreen) screenHistory.push(id);
+    currentScreen = id;
+    // Reset scroll
+    const sc = document.getElementById(id).querySelector('.scroll-content');
+    if (sc) sc.scrollTop = 0;
+  }
+
+  function goBack() {
+    if (screenHistory.length > 1) {
+      screenHistory.pop();
+      const prev = screenHistory[screenHistory.length - 1];
+      document.getElementById(currentScreen).classList.remove('active');
+      document.getElementById(prev).classList.add('active');
+      currentScreen = prev;
+    }
+  }
+
+function setNav(el) {
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  el.classList.add('active');
+}
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function switchAchTab(tab, btn) {
+    document.querySelectorAll('.ach-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('ach-leaderboard').style.display = 'none';
+    document.getElementById('ach-badge').style.display = 'none';
+    document.getElementById('ach-quiz').style.display = 'none';
+    document.getElementById('ach-' + tab).style.display = 'block';
+  }
+
+  function setTimeTab(btn) {
+    document.querySelectorAll('.time-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function toggleFaq(el) {
+    el.classList.toggle('open');
+  }
+
+  function selectReportType(el) {
+    document.querySelectorAll('.report-type-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Category tabs in store
+  document.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
