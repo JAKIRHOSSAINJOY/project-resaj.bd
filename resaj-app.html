@@ -216,7 +216,7 @@
   /* ===== VIDEO BANNER ===== */
   .video-banner {
     margin: 12px 14px;
-    background: #d4ecd4;
+    background: url(images/videobanner.png)
     border-radius: 14px;
     height: 160px;
     display: flex;
@@ -1467,11 +1467,7 @@
 
   <div class="scroll-content">
     <!-- Video Banner -->
-    <div class="video-banner">
-      <div class="play-btn">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </div>
-    </div>
+    <div class="video-banner"></div>
 
     <!-- Quick Actions -->
     <div class="quick-actions">
@@ -1592,22 +1588,8 @@
       <span class="nav-label">Home</span>
     </div>
 <div class="nav-item" onclick="showScreen('screen-store'); setNav(this)">
-  <svg viewBox="0 0 100 100" width="24" height="24" fill="currentColor">
-    <mask id="store-mask">
-      <rect width="100" height="100" fill="white" />
-      <rect x="25" y="55" width="20" height="30" fill="black" />
-      <rect x="50" y="55" width="25" height="20" fill="black" />
-      <text x="50" y="31" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="black" text-anchor="middle" letter-spacing="1">STORE</text>
-    </mask>
-    
-    <g mask="url(#store-mask)">
-      <rect x="15" y="85" width="70" height="5" rx="2" />
-      <rect x="20" y="50" width="60" height="35" />
-      <rect x="18" y="15" width="64" height="20" rx="2" />
-      <path d="M18 35h64v10c0 4.42-3.58 8-8 8s-8-3.58-8-8c0 4.42-3.58 8-8 8s-8-3.58-8-8c0 4.42-3.58 8-8 8s-8-3.58-8-8v-10z" />
-    </g>
-  </svg>
-  <span>Store</span>
+  <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
+  <span class="nav-label">Store</span>
 </div>
     <div class="nav-scan-wrap" onclick="showScreen('screen-scan')">
       <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg>
@@ -1716,7 +1698,7 @@
       <span class="nav-label">Home</span>
     </div>
     <div class="nav-item active" onclick="setNav(this)">
-      <svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
       <span class="nav-label">Store</span>
     </div>
     <div class="nav-scan-wrap" onclick="showScreen('screen-scan')">
@@ -1816,7 +1798,7 @@
 
   <div class="bottom-nav">
     <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
-    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg><span class="nav-label">Store</span></div>
     <div class="nav-scan-wrap active-scan" style="background:rgba(255,255,255,0.3)" onclick="showToast('Scanner active')">
       <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg>
     </div>
@@ -1952,7 +1934,7 @@
 
   <div class="bottom-nav">
     <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
-    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg><span class="nav-label">Store</span></div>
     <div class="nav-scan-wrap" onclick="showScreen('screen-scan')"><svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg></div>
     <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg><span class="nav-label">Achievement</span></div>
     <div class="nav-item" onclick="showScreen('screen-wallet')"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg><span class="nav-label">Wallet</span></div>
@@ -2007,7 +1989,7 @@
 
   <div class="bottom-nav">
     <div class="nav-item" onclick="showScreen('screen-home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="nav-label">Home</span></div>
-    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg><span class="nav-label">Store</span></div>
+    <div class="nav-item" onclick="showScreen('screen-store')"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg><span class="nav-label">Store</span></div>
     <div class="nav-scan-wrap" onclick="showScreen('screen-scan')"><svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/></svg></div>
     <div class="nav-item" onclick="showScreen('screen-achievement')"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg><span class="nav-label">Achievement</span></div>
     <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28A2 2 0 0022 15V9a2 2 0 00-1-1.72z"/></svg><span class="nav-label">Wallet</span></div>
